@@ -1,27 +1,130 @@
+@import url('https://fonts.googleapis.com/css2?family=DM+Serif+Display:ital@0;1&display=swap');
+@import url('https://fonts.googleapis.com/css2?family=Plus+Jakarta+Sans:wght@300;400;500;600;700&display=swap');
+@import url('https://fonts.googleapis.com/css2?family=DM+Mono:wght@400;500&display=swap');
+
 @tailwind base;
 @tailwind components;
 @tailwind utilities;
 
 :root {
-  --background: #ffffff;
-  --foreground: #171717;
-}
+  /* ── BACKGROUNDS ───────────────────────────────────── */
+  --color-bg:             #FFFFFF;
+  --color-bg-surface:     #FFFFFF;
+  --color-bg-subtle:      #F7F7F8;
+  --color-bg-muted:       #F0F0F2;
 
-@media (prefers-color-scheme: dark) {
-  :root {
-    --background: #0a0a0a;
-    --foreground: #ededed;
-  }
+  /* ── AREA CARD TINTS ─────────────────────────────── */
+  --color-card-lavender:  #EDE8FF;
+  --color-card-peach:     #FFE8E4;
+  --color-card-sky:       #E8F3FF;
+  --color-card-mint:      #E4F9F0;
+  --color-card-lemon:     #FFF8E1;
+  --color-card-rose:      #FFE4EE;
+
+  /* ── TEXT ───────────────────────────────────────────── */
+  --color-text-primary:   #111111;
+  --color-text-body:      #333333;
+  --color-text-secondary: #888888;
+  --color-text-muted:     #BBBBBB;
+  --color-text-inverse:   #FFFFFF;
+
+  /* ── ACCENT — Coral Red ─────────────────────────────── */
+  --color-accent:         #FF3B30;
+  --color-accent-hover:   #E5342A;
+  --color-accent-light:   #FFE5E4;
+  --color-accent-subtle:  #FFF5F5;
+
+  /* ── PRIMARY — Indigo ───────────────────────────────── */
+  --color-primary:        #5956E9;
+  --color-primary-hover:  #4845D4;
+  --color-primary-light:  #EEEEFF;
+  --color-primary-glow:   rgba(89, 86, 233, 0.30);
+
+  /* ── SEMANTIC ────────────────────────────────────────── */
+  --color-success:        #34C759;
+  --color-success-light:  #E6F9EC;
+  --color-warning:        #FF9500;
+  --color-warning-light:  #FFF3E0;
+  --color-danger:         #FF3B30;
+  --color-danger-light:   #FFE5E4;
+  --color-info:           #007AFF;
+  --color-info-light:     #E5F1FF;
+
+  /* ── BORDERS ─────────────────────────────────────────── */
+  --color-border:         #EEEEEE;
+  --color-border-strong:  #DDDDDD;
+  --color-border-focus:   #5956E9;
+
+  /* ── PRIORITY ────────────────────────────────────────── */
+  --color-p1:             #FF3B30;
+  --color-p2:             #FF9500;
+  --color-p3:             #AAAAAA;
+
+  /* ── TYPOGRAPHY ──────────────────────────────────────── */
+  --font-display: 'DM Serif Display', Georgia, serif;
+  --font-ui:      'Plus Jakarta Sans', system-ui, sans-serif;
+  --font-mono:    'DM Mono', monospace;
+
+  /* ── TYPE SCALE ──────────────────────────────────────── */
+  --text-xs:    0.688rem;
+  --text-sm:    0.813rem;
+  --text-base:  0.938rem;
+  --text-md:    1.063rem;
+  --text-lg:    1.25rem;
+  --text-xl:    1.5rem;
+  --text-2xl:   1.875rem;
+  --text-3xl:   2.5rem;
+
+  /* ── SPACING ─────────────────────────────────────────── */
+  --space-1:  4px;
+  --space-2:  8px;
+  --space-3:  12px;
+  --space-4:  16px;
+  --space-5:  20px;
+  --space-6:  24px;
+  --space-8:  32px;
+  --space-10: 40px;
+  --space-12: 48px;
+  --space-16: 64px;
+  --page-x:         20px;
+  --page-x-desktop: 32px;
+
+  /* ── RADIUS ──────────────────────────────────────────── */
+  --radius-sm:   8px;
+  --radius-md:   12px;
+  --radius-lg:   20px;
+  --radius-xl:   28px;
+  --radius-full: 9999px;
+
+  /* ── SHADOWS ─────────────────────────────────────────── */
+  --shadow-xs:   0 1px 3px rgba(0,0,0,0.04);
+  --shadow-sm:   0 2px 8px rgba(0,0,0,0.06);
+  --shadow-card: 0 2px 12px rgba(0,0,0,0.05);
+  --shadow-nav:  0 -1px 0px rgba(0,0,0,0.06);
+  --shadow-cta:  0 4px 16px rgba(89,86,233,0.35);
 }
 
 body {
-  color: var(--foreground);
-  background: var(--background);
-  font-family: Arial, Helvetica, sans-serif;
+  color: var(--color-text-body);
+  background: var(--color-bg);
+  font-family: var(--font-ui);
+  -webkit-font-smoothing: antialiased;
+  -moz-osx-font-smoothing: grayscale;
 }
 
-@layer utilities {
-  .text-balance {
-    text-wrap: balance;
-  }
+h1, h2, h3 {
+  color: var(--color-text-primary);
+}
+
+/* Scrollbar styling */
+::-webkit-scrollbar {
+  width: 6px;
+  height: 6px;
+}
+::-webkit-scrollbar-track {
+  background: transparent;
+}
+::-webkit-scrollbar-thumb {
+  background: var(--color-border-strong);
+  border-radius: var(--radius-full);
 }
