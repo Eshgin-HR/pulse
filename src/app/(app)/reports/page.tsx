@@ -93,8 +93,14 @@ export default function ReportsPage() {
   }, []);
 
   useEffect(() => {
-    document.addEventListener('click', () => setOpenFilter(null));
-    return () => document.removeEventListener('click', () => setOpenFilter(null));
+    function handleClick(e: MouseEvent) {
+      const target = e.target as HTMLElement;
+      if (!target.closest('[data-dropdown]')) {
+        setOpenFilter(null);
+      }
+    }
+    document.addEventListener('click', handleClick);
+    return () => document.removeEventListener('click', handleClick);
   }, []);
 
   const today = new Date().toISOString().split('T')[0];
