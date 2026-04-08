@@ -5,7 +5,7 @@ import { createClient } from '@/lib/supabase/client';
 import { Task, Portfolio, TaskStatus, Urgency, STATUS_CONFIG, URGENCY_CONFIG } from '@/types';
 import { cn, formatDate, dueDateColor } from '@/lib/utils';
 import Link from 'next/link';
-import { Plus, Search, X, ChevronDown, Clock, MoreHorizontal, Trash2, Archive, Calendar, Pencil } from 'lucide-react';
+import { Plus, Search, X, ChevronDown, Clock, MoreHorizontal, Trash2, Archive, Calendar, Pencil, RotateCcw } from 'lucide-react';
 
 type SortField = 'due_date' | 'urgency' | 'status' | 'title' | 'created_at';
 type SortDir = 'asc' | 'desc';
@@ -467,10 +467,7 @@ export default function TasksPage() {
               const isDone = task.status === 'done';
               return (
                 <div key={task.id}
-                  className={cn(
-                    'grid grid-cols-[32px_1fr_140px_90px_100px_85px_minmax(120px,1fr)_36px] items-center h-11 px-4 group hover:bg-subtle/50 transition-colors',
-                    isDone && 'opacity-50'
-                  )}
+                  className="grid grid-cols-[32px_1fr_140px_90px_100px_85px_minmax(120px,1fr)_36px] items-center h-11 px-4 group hover:bg-subtle/50 transition-colors"
                 >
                   <button onClick={() => toggleDone(task)} className="flex items-center justify-center">
                     <div className={cn(
@@ -535,7 +532,13 @@ export default function TasksPage() {
                       <MoreHorizontal size={14} />
                     </button>
                     {menuTaskId === task.id && (
-                      <div className="absolute right-0 top-8 z-50 w-36 bg-surface border border-border rounded-lg shadow-dropdown py-1">
+                      <div className="absolute right-0 top-8 z-50 w-40 bg-surface border border-border rounded-lg shadow-dropdown py-1">
+                        {isDone && (
+                          <button onClick={() => { updateStatus(task.id, 'todo'); setMenuTaskId(null); }}
+                            className="w-full flex items-center gap-2 px-3 py-1.5 text-sm text-tx-secondary hover:bg-subtle hover:text-tx-primary transition-colors">
+                            <RotateCcw size={13} /> Reopen
+                          </button>
+                        )}
                         <button onClick={() => openEditModal(task)}
                           className="w-full flex items-center gap-2 px-3 py-1.5 text-sm text-tx-secondary hover:bg-subtle hover:text-tx-primary transition-colors">
                           <Pencil size={13} /> Edit
