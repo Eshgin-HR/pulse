@@ -25,7 +25,7 @@ const navItems = [
   { href: '/tasks', label: 'Tasks', icon: CheckSquare },
   { href: '/portfolio', label: 'Portfolio', icon: FolderKanban },
   { href: '/board', label: 'Kanban Board', icon: Columns3 },
-  { href: '#', label: 'Timeline', icon: Calendar, soon: true },
+  { href: '/timeline', label: 'Timeline', icon: Calendar },
   { href: '/reports', label: 'Reports', icon: BarChart3 },
   { href: '/ai', label: 'Ask AI', icon: Sparkles },
 ];
@@ -36,6 +36,7 @@ const pageTitles: Record<string, string> = {
   '/portfolio': 'Portfolio',
   '/settings': 'Settings',
   '/board': 'Kanban Board',
+  '/timeline': 'Timeline',
   '/reports': 'Reports',
   '/ai': 'Ask AI',
 };
@@ -91,28 +92,19 @@ export default function AppLayout({ children }: { children: React.ReactNode }) {
             return (
               <Link
                 key={item.label}
-                href={item.soon ? '#' : item.href}
+                href={item.href}
                 title={collapsed ? item.label : undefined}
                 className={cn(
                   'flex items-center gap-2.5 rounded-md text-sm font-medium transition-all duration-100',
                   collapsed ? 'justify-center h-9 w-9 mx-auto' : 'h-8 px-2.5',
                   isActive
                     ? 'bg-brand-subtle text-brand'
-                    : item.soon
-                    ? 'text-tx-muted/50 cursor-default'
                     : 'text-tx-secondary hover:text-tx-primary hover:bg-subtle'
                 )}
               >
                 <item.icon size={16} className={cn(isActive && 'text-brand')} />
                 {!collapsed && (
-                  <>
-                    <span className="flex-1">{item.label}</span>
-                    {item.soon && (
-                      <span className="text-[9px] font-medium bg-subtle text-tx-muted rounded px-1.5 py-px uppercase tracking-wider">
-                        Soon
-                      </span>
-                    )}
-                  </>
+                  <span className="flex-1">{item.label}</span>
                 )}
               </Link>
             );
