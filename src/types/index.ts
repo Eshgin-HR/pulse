@@ -59,22 +59,22 @@ export const PORTFOLIO_COLORS = [
 ];
 
 export const STATUS_CONFIG: Record<TaskStatus, { label: string; color: string; bg: string }> = {
-  todo: { label: 'To Do', color: 'var(--s-todo)', bg: 'var(--p-low-bg)' },
-  in_progress: { label: 'In Progress', color: 'var(--s-inprogress)', bg: 'var(--p-medium-bg)' },
-  in_review: { label: 'In Review', color: 'var(--s-review)', bg: 'var(--brand-pink-light)' },
-  done: { label: 'Done', color: 'var(--s-done)', bg: 'rgba(107, 191, 138, 0.12)' },
+  todo: { label: 'To Do', color: '#71717A', bg: 'rgba(113, 113, 122, 0.12)' },
+  in_progress: { label: 'In Progress', color: '#3B82F6', bg: 'rgba(59, 130, 246, 0.12)' },
+  in_review: { label: 'In Review', color: '#8B5CF6', bg: 'rgba(139, 92, 246, 0.12)' },
+  done: { label: 'Done', color: '#22C55E', bg: 'rgba(34, 197, 94, 0.12)' },
 };
 
 export const URGENCY_CONFIG: Record<Urgency, { label: string; color: string; bg: string }> = {
-  critical: { label: 'Critical', color: 'var(--p-critical)', bg: 'var(--p-critical-bg)' },
-  high: { label: 'High', color: 'var(--p-high)', bg: 'var(--p-high-bg)' },
-  medium: { label: 'Medium', color: 'var(--p-medium)', bg: 'var(--p-medium-bg)' },
-  low: { label: 'Low', color: 'var(--p-low)', bg: 'var(--p-low-bg)' },
+  critical: { label: 'Critical', color: '#EF4444', bg: 'rgba(239, 68, 68, 0.12)' },
+  high: { label: 'High', color: '#F59E0B', bg: 'rgba(245, 158, 11, 0.12)' },
+  medium: { label: 'Medium', color: '#3B82F6', bg: 'rgba(59, 130, 246, 0.12)' },
+  low: { label: 'Low', color: '#6B7280', bg: 'rgba(107, 114, 128, 0.12)' },
 };
 
 export const PORTFOLIO_STATUS_CONFIG: Record<PortfolioStatus, { label: string; color: string; bg: string }> = {
-  planning: { label: 'Planning', color: 'var(--s-todo)', bg: 'var(--p-low-bg)' },
-  in_progress: { label: 'In Progress', color: 'var(--s-inprogress)', bg: 'var(--p-medium-bg)' },
-  on_hold: { label: 'On Hold', color: 'var(--p-high)', bg: 'var(--p-high-bg)' },
-  completed: { label: 'Completed', color: 'var(--s-done)', bg: 'rgba(107, 191, 138, 0.12)' },
+  planning: { label: 'Planning', color: '#71717A', bg: 'rgba(113, 113, 122, 0.12)' },
+  in_progress: { label: 'In Progress', color: '#3B82F6', bg: 'rgba(59, 130, 246, 0.12)' },
+  on_hold: { label: 'On Hold', color: '#F59E0B', bg: 'rgba(245, 158, 11, 0.12)' },
+  completed: { label: 'Completed', color: '#22C55E', bg: 'rgba(34, 197, 94, 0.12)' },
 };
