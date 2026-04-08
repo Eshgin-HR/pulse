@@ -265,40 +265,38 @@ export default function TasksPage() {
     });
   }
 
-  function exportToPdf() {
-    import('jspdf').then(({ jsPDF }) => {
-      import('jspdf-autotable').then(() => {
-        const doc = new jsPDF({ orientation: 'landscape' });
-        doc.setFontSize(16);
-        doc.text('PULSE — Tasks Export', 14, 15);
-        doc.setFontSize(9);
-        doc.setTextColor(100);
-        doc.text(`Generated ${new Date().toLocaleDateString()} · ${filteredTasks.length} tasks`, 14, 22);
+  async function exportToPdf() {
+    const { jsPDF } = await import('jspdf');
+    const autoTable = (await import('jspdf-autotable')).default;
 
-        const rows = filteredTasks.map(t => [
-          t.title,
-          t.portfolio?.name?.split('—')[0].trim() || '—',
-          STATUS_CONFIG[t.status].label,
-          URGENCY_CONFIG[t.urgency].label,
-          t.start_date || '—',
-          t.due_date || '—',
-          (t.notes || '').slice(0, 50),
-        ]);
+    const doc = new jsPDF({ orientation: 'landscape' });
+    doc.setFontSize(16);
+    doc.text('PULSE — Tasks Export', 14, 15);
+    doc.setFontSize(9);
+    doc.setTextColor(100);
+    doc.text(`Generated ${new Date().toLocaleDateString()} · ${filteredTasks.length} tasks`, 14, 22);
 
-        // eslint-disable-next-line @typescript-eslint/no-explicit-any
-        (doc as any).autoTable({
-          startY: 28,
-          head: [['Task', 'Portfolio', 'Status', 'Urgency', 'Start', 'Due', 'Notes']],
-          body: rows,
-          styles: { fontSize: 8, cellPadding: 2 },
-          headStyles: { fillColor: [59, 130, 246], textColor: 255, fontStyle: 'bold' },
-          alternateRowStyles: { fillColor: [245, 245, 245] },
-          columnStyles: { 0: { cellWidth: 60 }, 6: { cellWidth: 40 } },
-        });
+    const rows = filteredTasks.map(t => [
+      t.title,
+      t.portfolio?.name?.split('—')[0].trim() || '—',
+      STATUS_CONFIG[t.status].label,
+      URGENCY_CONFIG[t.urgency].label,
+      t.start_date || '—',
+      t.due_date || '—',
+      (t.notes || '').slice(0, 50),
+    ]);
 
-        doc.save(`pulse-tasks-${new Date().toISOString().split('T')[0]}.pdf`);
-      });
+    autoTable(doc, {
+      startY: 28,
+      head: [['Task', 'Portfolio', 'Status', 'Urgency', 'Start', 'Due', 'Notes']],
+      body: rows,
+      styles: { fontSize: 8, cellPadding: 2 },
+      headStyles: { fillColor: [59, 130, 246], textColor: 255, fontStyle: 'bold' },
+      alternateRowStyles: { fillColor: [245, 245, 245] },
+      columnStyles: { 0: { cellWidth: 60 }, 6: { cellWidth: 40 } },
     });
+
+    doc.save(`pulse-tasks-${new Date().toISOString().split('T')[0]}.pdf`);
   }
 
   if (loading) {
