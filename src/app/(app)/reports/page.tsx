@@ -75,6 +75,12 @@ export default function ReportsPage() {
   const [sectionInsights, setSectionInsights] = useState<Record<string, string>>({});
   const [sectionLoading, setSectionLoading] = useState<Record<string, boolean>>({});
 
+  // Bottlenecks
+  const [bottlenecks, setBottlenecks] = useState<{ type: string; severity: string; title: string; detail: string; tasks?: string[] }[]>([]);
+  const [bottleneckAi, setBottleneckAi] = useState('');
+  const [bottleneckLoading, setBottleneckLoading] = useState(false);
+  const [expandedBottleneck, setExpandedBottleneck] = useState<number | null>(null);
+
   useEffect(() => {
     async function load() {
       const supabase = createClient();
@@ -88,9 +94,22 @@ export default function ReportsPage() {
         if (p.length >= 2) { setComparePortfolioA(p[0].id); setComparePortfolioB(p[1].id); }
       }
       setLoading(false);
+      // Auto-fetch bottlenecks
+      fetchBottlenecks();
     }
     load();
-  }, []);
+  }, []); // eslint-disable-line react-hooks/exhaustive-deps
+
+  async function fetchBottlenecks() {
+    setBottleneckLoading(true);
+    try {
+      const res = await fetch('/api/ai/bottlenecks', { method: 'POST' });
+      const data = await res.json();
+      if (data.bottlenecks) setBottlenecks(data.bottlenecks);
+      if (data.aiAnalysis) setBottleneckAi(data.aiAnalysis);
+    } catch { /* ignore */ }
+    setBottleneckLoading(false);
+  }
 
   useEffect(() => {
     function handleClick(e: MouseEvent) {
@@ -408,6 +427,75 @@ export default function ReportsPage() {
         </div>
         {aiLoading ? <div className="flex items-center gap-2 py-4"><Loader2 size={14} className="animate-spin text-brand" /><span className="text-sm text-tx-muted">Analyzing...</span></div>
           : <p className="text-sm text-tx-primary leading-relaxed">{aiSummary}</p>}
+      </div>
+
+      {/* ═══ BOTTLENECKS ═══ */}
+      <div className="card-gradient rounded-xl p-5 mb-5">
+        <div className="flex items-center justify-between mb-4">
+          <div className="flex items-center gap-2">
+            <AlertTriangle size={14} className="text-[var(--p-critical)]" />
+            <h2 className="text-2xs font-semibold text-tx-secondary uppercase tracking-widest">Bottleneck Detection</h2>
+          </div>
+          <button onClick={fetchBottlenecks} disabled={bottleneckLoading}
+            className="p-1.5 rounded-md hover:bg-subtle text-tx-muted hover:text-tx-primary transition-colors">
+            <RefreshCw size={13} className={bottleneckLoading ? 'animate-spin' : ''} />
+          </button>
+        </div>
+
+        {bottleneckLoading ? (
+          <div className="flex items-center gap-2 py-6"><Loader2 size={14} className="animate-spin text-brand" /><span className="text-sm text-tx-muted">Scanning for bottlenecks...</span></div>
+        ) : bottlenecks.length === 0 ? (
+          <div className="py-6 text-center"><CheckCircle2 size={20} className="text-[var(--s-done)] mx-auto mb-2" /><p className="text-sm text-tx-muted">No bottlenecks detected. Nice work.</p></div>
+        ) : (
+          <>
+            {/* AI Diagnosis */}
+            {bottleneckAi && (
+              <div className="flex items-start gap-2 mb-4 p-3 rounded-lg bg-brand-subtle">
+                <Sparkles size={13} className="text-brand shrink-0 mt-0.5" />
+                <p className="text-sm text-tx-primary leading-relaxed">{bottleneckAi}</p>
+              </div>
+            )}
+
+            {/* Bottleneck Cards */}
+            <div className="flex flex-col gap-2">
+              {bottlenecks.map((b, i) => (
+                <div key={i} className={cn(
+                  'rounded-lg border p-3 transition-colors',
+                  b.severity === 'critical' ? 'border-[var(--p-critical)]/30 bg-[var(--p-critical-bg)]' :
+                  b.severity === 'high' ? 'border-[var(--p-high)]/30 bg-[var(--p-high-bg)]' :
+                  'border-border bg-subtle/50'
+                )}>
+                  <div className="flex items-start justify-between gap-3">
+                    <div className="flex-1">
+                      <div className="flex items-center gap-2 mb-1">
+                        <span className={cn('text-2xs font-bold uppercase px-1.5 py-0.5 rounded',
+                          b.severity === 'critical' ? 'bg-[var(--p-critical)] text-white' :
+                          b.severity === 'high' ? 'bg-[var(--p-high)] text-white' :
+                          'bg-tx-muted text-white'
+                        )}>{b.severity}</span>
+                        <span className="text-sm font-semibold text-tx-primary">{b.title}</span>
+                      </div>
+                      <p className="text-2xs text-tx-secondary leading-relaxed">{b.detail}</p>
+                    </div>
+                    {b.tasks && b.tasks.length > 0 && (
+                      <button onClick={() => setExpandedBottleneck(expandedBottleneck === i ? null : i)}
+                        className="text-2xs text-tx-muted hover:text-brand transition-colors shrink-0">
+                        {expandedBottleneck === i ? 'Hide' : `${b.tasks.length} tasks`}
+                      </button>
+                    )}
+                  </div>
+                  {expandedBottleneck === i && b.tasks && (
+                    <div className="mt-2 pt-2 border-t border-border/50 flex flex-col gap-1">
+                      {b.tasks.map((t, j) => (
+                        <span key={j} className="text-2xs text-tx-secondary">• {t}</span>
+                      ))}
+                    </div>
+                  )}
+                </div>
+              ))}
+            </div>
+          </>
+        )}
       </div>
 
       {/* ═══ KPI CARDS ═══ */}
