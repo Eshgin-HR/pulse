@@ -5,7 +5,7 @@ import { createClient } from '@/lib/supabase/client';
 import { Task, Portfolio, TaskStatus, Urgency, STATUS_CONFIG, URGENCY_CONFIG } from '@/types';
 import { cn, formatDate, dueDateColor } from '@/lib/utils';
 import Link from 'next/link';
-import { Plus, Search, X, ChevronDown, Clock, MoreHorizontal, Trash2, Archive, Calendar, Pencil, RotateCcw, FileDown, FileSpreadsheet } from 'lucide-react';
+import { Plus, Search, X, ChevronDown, Clock, MoreHorizontal, Trash2, Archive, Calendar, Pencil, RotateCcw, FileDown, FileSpreadsheet, Sparkles, Loader2 } from 'lucide-react';
 
 type SortField = 'due_date' | 'urgency' | 'status' | 'title' | 'created_at';
 type SortDir = 'asc' | 'desc';
@@ -38,6 +38,8 @@ export default function TasksPage() {
   const [newUrgency, setNewUrgency] = useState<Urgency>('medium');
   const [newDescription, setNewDescription] = useState('');
   const [newNotes, setNewNotes] = useState('');
+  const [aiSuggesting, setAiSuggesting] = useState(false);
+  const [aiSuggested, setAiSuggested] = useState(false);
 
   // Context menu
   const [menuTaskId, setMenuTaskId] = useState<string | null>(null);
@@ -221,7 +223,29 @@ export default function TasksPage() {
     setNewTitle(''); setNewDueDate(''); setNewStartDate('');
     setNewStatus('todo'); setNewUrgency('medium');
     setNewDescription(''); setNewNotes('');
+    setAiSuggested(false); setAiSuggesting(false);
     if (portfolios.length > 0) setNewPortfolioId(portfolios[0].id);
+  }
+
+  async function aiSuggest() {
+    if (!newTitle.trim() || aiSuggesting) return;
+    setAiSuggesting(true);
+    try {
+      const res = await fetch('/api/ai/categorize', {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({ title: newTitle.trim() }),
+      });
+      const { suggestion } = await res.json();
+      if (suggestion) {
+        if (suggestion.portfolio_id) setNewPortfolioId(suggestion.portfolio_id);
+        if (suggestion.urgency) setNewUrgency(suggestion.urgency);
+        if (suggestion.due_date) setNewDueDate(suggestion.due_date);
+        if (suggestion.status) setNewStatus(suggestion.status);
+        setAiSuggested(true);
+      }
+    } catch (e) { console.error('AI suggest failed:', e); }
+    setAiSuggesting(false);
   }
 
   async function deleteTask(taskId: string) {
@@ -643,10 +667,24 @@ export default function TasksPage() {
 
             {/* Modal Body */}
             <div className="px-6 py-5 flex flex-col gap-4">
-              {/* Title */}
+              {/* Title + AI Suggest */}
               <div>
-                <label className="text-2xs font-semibold text-tx-secondary uppercase tracking-widest mb-1.5 block">Task name *</label>
-                <input autoFocus type="text" value={newTitle} onChange={(e) => setNewTitle(e.target.value)}
+                <div className="flex items-center justify-between mb-1.5">
+                  <label className="text-2xs font-semibold text-tx-secondary uppercase tracking-widest">Task name *</label>
+                  {!editingTaskId && (
+                    <button onClick={aiSuggest} disabled={!newTitle.trim() || aiSuggesting}
+                      className={cn(
+                        'flex items-center gap-1 text-2xs font-medium px-2 py-0.5 rounded-md transition-colors',
+                        aiSuggested ? 'text-[var(--s-done)] bg-[rgba(34,197,94,0.1)]' : 'text-brand hover:bg-brand-subtle',
+                        (!newTitle.trim() || aiSuggesting) && 'opacity-40 cursor-not-allowed'
+                      )}>
+                      {aiSuggesting ? <Loader2 size={11} className="animate-spin" /> : <Sparkles size={11} />}
+                      {aiSuggesting ? 'Suggesting...' : aiSuggested ? 'AI applied ✓' : 'AI Suggest'}
+                    </button>
+                  )}
+                </div>
+                <input autoFocus type="text" value={newTitle}
+                  onChange={(e) => { setNewTitle(e.target.value); setAiSuggested(false); }}
                   placeholder="What needs to be done?"
                   className="w-full h-9 px-3 rounded-lg bg-subtle border border-border text-sm text-tx-primary placeholder:text-tx-muted focus:outline-none focus:border-border-focus" />
               </div>
