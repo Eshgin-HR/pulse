@@ -1,11 +1,6 @@
 import { NextRequest, NextResponse } from 'next/server';
-import { openai } from '@/lib/openai/client';
+import OpenAI from 'openai';
 import { createClient } from '@supabase/supabase-js';
-
-const supabase = createClient(
-  process.env.NEXT_PUBLIC_SUPABASE_URL!,
-  process.env.SUPABASE_SERVICE_ROLE_KEY!
-);
 
 export async function POST(req: NextRequest) {
   try {
@@ -14,6 +9,12 @@ export async function POST(req: NextRequest) {
     if (!message || typeof message !== 'string') {
       return NextResponse.json({ error: 'Message is required' }, { status: 400 });
     }
+
+    const openai = new OpenAI({ apiKey: process.env.OPENAI_API_KEY });
+    const supabase = createClient(
+      process.env.NEXT_PUBLIC_SUPABASE_URL!,
+      process.env.SUPABASE_SERVICE_ROLE_KEY!
+    );
 
     // Fetch all portfolios and tasks
     const [{ data: portfolios }, { data: tasks }] = await Promise.all([
