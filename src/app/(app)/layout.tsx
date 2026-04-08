@@ -24,7 +24,7 @@ const navItems = [
   { href: '/home', label: 'Home', icon: Home },
   { href: '/tasks', label: 'Tasks', icon: CheckSquare },
   { href: '/portfolio', label: 'Portfolio', icon: FolderKanban },
-  { href: '#', label: 'Board', icon: Columns3, soon: true },
+  { href: '/board', label: 'Board', icon: Columns3 },
   { href: '#', label: 'Timeline', icon: Calendar, soon: true },
   { href: '/reports', label: 'Reports', icon: BarChart3 },
   { href: '/ai', label: 'Ask AI', icon: Sparkles },
@@ -35,6 +35,7 @@ const pageTitles: Record<string, string> = {
   '/tasks': 'Tasks',
   '/portfolio': 'Portfolio',
   '/settings': 'Settings',
+  '/board': 'Board',
   '/reports': 'Reports',
   '/ai': 'Ask AI',
 };
