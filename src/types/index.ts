@@ -1,154 +1,80 @@
-export type AreaPriority = 'p1' | 'p2' | 'p3';
-export type AreaStatus = 'active' | 'paused' | 'completed';
-export type TaskStatus = 'todo' | 'in_progress' | 'done';
-export type WeekStatus = 'on_track' | 'slightly_delayed' | 'blocked';
-export type BlockerType = 'person' | 'system' | 'decision' | 'resource';
-export type LogStatus = 'draft' | 'complete';
-export type ColorTag = 'lavender' | 'peach' | 'sky' | 'mint' | 'lemon' | 'rose';
+export type PortfolioStatus = 'planning' | 'in_progress' | 'on_hold' | 'completed';
+export type TaskStatus = 'todo' | 'in_progress' | 'in_review' | 'done';
+export type Urgency = 'low' | 'medium' | 'high' | 'critical';
 
-export interface Area {
+export interface Portfolio {
   id: string;
-  user_id: string;
   name: string;
-  priority: AreaPriority;
-  color_tag: ColorTag;
-  status: AreaStatus;
+  description: string | null;
+  status: PortfolioStatus;
+  color: string;
+  is_archived: boolean;
   sort_order: number;
   created_at: string;
   updated_at: string;
+  // Computed
+  task_count?: number;
+  done_count?: number;
+  overdue_count?: number;
+  nearest_due?: string | null;
 }
 
 export interface Task {
   id: string;
-  area_id: string;
-  user_id: string;
-  name: string;
-  status: TaskStatus;
-  notes: string | null;
-  sort_order: number;
-  created_at: string;
-  updated_at: string;
-  area?: Area;
-}
-
-export interface Skill {
-  id: string;
-  user_id: string;
-  name: string;
-  description: string | null;
-  sort_order: number;
-  is_active: boolean;
-  created_at: string;
-}
-
-export interface WeeklyLog {
-  id: string;
-  user_id: string;
-  week_start: string;
-  week_number: number;
-  year: number;
-  honest_reflection: string | null;
-  energy_level: number | null;
-  focus_level: number | null;
-  status: LogStatus;
-  created_at: string;
-  updated_at: string;
-}
-
-export interface AreaWeeklyEntry {
-  id: string;
-  log_id: string;
-  area_id: string;
-  accomplishments: string | null;
-  status: WeekStatus;
-  actual_pct: number;
-  ideal_pct: number;
-  created_at: string;
-  area?: Area;
-}
-
-export interface Blocker {
-  id: string;
-  log_id: string;
-  user_id: string;
-  description: string;
-  blocking_what: string | null;
-  blocker_type: BlockerType;
-  blocking_name: string | null;
-  since_date: string;
-  is_resolved: boolean;
-  resolved_at: string | null;
-  created_at: string;
-  age_days?: number;
-}
-
-export interface GrowthEntry {
-  id: string;
-  log_id: string;
-  skill_id: string;
-  evidence: string;
-  rating: number;
-  created_at: string;
-  skill?: Skill;
-}
-
-export interface Priority {
-  rank: number;
   title: string;
-  reason: string;
-  area_id?: string;
+  portfolio_id: string | null;
+  description: string | null;
+  notes: string | null;
+  start_date: string | null;
+  due_date: string | null;
+  status: TaskStatus;
+  urgency: Urgency;
+  is_archived: boolean;
+  sort_order: number;
+  created_at: string;
+  updated_at: string;
+  // Joined
+  portfolio?: Portfolio;
+  subtasks?: Subtask[];
 }
 
-export interface Briefing {
+export interface Subtask {
   id: string;
-  log_id: string;
-  user_id: string;
-  summary: string;
-  resource_diagnosis: string;
-  bottleneck_report: string;
-  priorities: Priority[];
-  growth_signal: string;
-  raw_prompt: string | null;
-  model_used: string;
-  tokens_used: number;
-  generated_at: string;
-  is_current: boolean;
+  task_id: string;
+  title: string;
+  is_done: boolean;
+  sort_order: number;
+  created_at: string;
 }
 
-export interface WeeklyPayload {
-  week: {
-    number: number;
-    year: number;
-    start: string;
-    end: string;
-  };
-  area_entries: AreaWeeklyEntry[];
-  blockers: Blocker[];
-  reflection: string;
-  energy_level: number;
-  focus_level: number;
-  growth_entries: GrowthEntry[];
-  history: {
-    last_4_weeks: WeeklyLog[];
-    skill_ratings: SkillRatingHistory[];
-  };
-}
+export const PORTFOLIO_COLORS = [
+  { value: '#1B3A2D', label: 'Forest' },
+  { value: '#1E3A5F', label: 'Navy' },
+  { value: '#4A1D5E', label: 'Plum' },
+  { value: '#7C2D12', label: 'Rust' },
+  { value: '#334155', label: 'Slate' },
+  { value: '#134E4A', label: 'Teal' },
+  { value: '#44403C', label: 'Stone' },
+  { value: '#312E81', label: 'Indigo' },
+];
 
-export interface SkillRatingHistory {
-  skill_id: string;
-  skill_name: string;
-  ratings: { week: string; rating: number | null }[];
-  rolling_avg: number | null;
-  trend: 'up' | 'flat' | 'down' | 'no_data';
-}
-
-export const AREA_COLORS: Record<ColorTag, string> = {
-  lavender: 'bg-card-lavender',
-  peach: 'bg-card-peach',
-  sky: 'bg-card-sky',
-  mint: 'bg-card-mint',
-  lemon: 'bg-card-lemon',
-  rose: 'bg-card-rose',
+export const STATUS_CONFIG: Record<TaskStatus, { label: string; color: string; bg: string }> = {
+  todo: { label: 'To Do', color: '#71717A', bg: 'rgba(113, 113, 122, 0.12)' },
+  in_progress: { label: 'In Progress', color: '#3B82F6', bg: 'rgba(59, 130, 246, 0.12)' },
+  in_review: { label: 'In Review', color: '#8B5CF6', bg: 'rgba(139, 92, 246, 0.12)' },
+  done: { label: 'Done', color: '#22C55E', bg: 'rgba(34, 197, 94, 0.12)' },
 };
 
-export const COLOR_TAG_OPTIONS: ColorTag[] = ['lavender', 'peach', 'sky', 'mint', 'lemon', 'rose'];
+export const URGENCY_CONFIG: Record<Urgency, { label: string; color: string; bg: string }> = {
+  critical: { label: 'Critical', color: '#EF4444', bg: 'rgba(239, 68, 68, 0.12)' },
+  high: { label: 'High', color: '#F59E0B', bg: 'rgba(245, 158, 11, 0.12)' },
+  medium: { label: 'Medium', color: '#3B82F6', bg: 'rgba(59, 130, 246, 0.12)' },
+  low: { label: 'Low', color: '#6B7280', bg: 'rgba(107, 114, 128, 0.12)' },
+};
+
+export const PORTFOLIO_STATUS_CONFIG: Record<PortfolioStatus, { label: string; color: string; bg: string }> = {
+  planning: { label: 'Planning', color: '#71717A', bg: 'rgba(113, 113, 122, 0.12)' },
+  in_progress: { label: 'In Progress', color: '#3B82F6', bg: 'rgba(59, 130, 246, 0.12)' },
+  on_hold: { label: 'On Hold', color: '#F59E0B', bg: 'rgba(245, 158, 11, 0.12)' },
+  completed: { label: 'Completed', color: '#22C55E', bg: 'rgba(34, 197, 94, 0.12)' },
+};
