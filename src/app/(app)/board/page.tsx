@@ -213,7 +213,7 @@ export default function BoardPage() {
 
       {/* Header + Filters */}
       <div className="flex items-center justify-between mb-4">
-        <h1 className="text-xl font-semibold text-tx-primary tracking-tight">Board</h1>
+        <h1 className="text-xl font-semibold text-tx-primary tracking-tight">Kanban Board</h1>
         <div className="flex items-center gap-2">
           <select value={filterPortfolio} onChange={e => setFilterPortfolio(e.target.value)}
             className={cn('h-8 px-3 rounded-lg border text-sm font-medium appearance-none cursor-pointer bg-surface transition-colors',
