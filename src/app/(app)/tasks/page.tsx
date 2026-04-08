@@ -5,7 +5,7 @@ import { createClient } from '@/lib/supabase/client';
 import { Task, Portfolio, TaskStatus, Urgency, STATUS_CONFIG, URGENCY_CONFIG } from '@/types';
 import { cn, formatDate, dueDateColor } from '@/lib/utils';
 import Link from 'next/link';
-import { Plus, Search, X, ChevronDown, Clock, MoreHorizontal, Trash2, Archive, Calendar, Pencil, RotateCcw } from 'lucide-react';
+import { Plus, Search, X, ChevronDown, Clock, MoreHorizontal, Trash2, Archive, Calendar, Pencil, RotateCcw, FileDown, FileSpreadsheet } from 'lucide-react';
 
 type SortField = 'due_date' | 'urgency' | 'status' | 'title' | 'created_at';
 type SortDir = 'asc' | 'desc';
@@ -245,6 +245,62 @@ export default function TasksPage() {
     setDateFrom(''); setDateTo(''); setSearch('');
   }
 
+  function exportToExcel() {
+    const data = filteredTasks.map(t => ({
+      'Task': t.title,
+      'Portfolio': t.portfolio?.name?.split('—')[0].trim() || '—',
+      'Status': STATUS_CONFIG[t.status].label,
+      'Urgency': URGENCY_CONFIG[t.urgency].label,
+      'Start Date': t.start_date || '—',
+      'Due Date': t.due_date || '—',
+      'Description': t.description || '',
+      'Notes': t.notes || '',
+    }));
+    import('xlsx').then(XLSX => {
+      const ws = XLSX.utils.json_to_sheet(data);
+      ws['!cols'] = [{ wch: 35 }, { wch: 20 }, { wch: 12 }, { wch: 10 }, { wch: 12 }, { wch: 12 }, { wch: 40 }, { wch: 30 }];
+      const wb = XLSX.utils.book_new();
+      XLSX.utils.book_append_sheet(wb, ws, 'Tasks');
+      XLSX.writeFile(wb, `pulse-tasks-${new Date().toISOString().split('T')[0]}.xlsx`);
+    });
+  }
+
+  function exportToPdf() {
+    import('jspdf').then(({ jsPDF }) => {
+      import('jspdf-autotable').then(() => {
+        const doc = new jsPDF({ orientation: 'landscape' });
+        doc.setFontSize(16);
+        doc.text('PULSE — Tasks Export', 14, 15);
+        doc.setFontSize(9);
+        doc.setTextColor(100);
+        doc.text(`Generated ${new Date().toLocaleDateString()} · ${filteredTasks.length} tasks`, 14, 22);
+
+        const rows = filteredTasks.map(t => [
+          t.title,
+          t.portfolio?.name?.split('—')[0].trim() || '—',
+          STATUS_CONFIG[t.status].label,
+          URGENCY_CONFIG[t.urgency].label,
+          t.start_date || '—',
+          t.due_date || '—',
+          (t.notes || '').slice(0, 50),
+        ]);
+
+        // eslint-disable-next-line @typescript-eslint/no-explicit-any
+        (doc as any).autoTable({
+          startY: 28,
+          head: [['Task', 'Portfolio', 'Status', 'Urgency', 'Start', 'Due', 'Notes']],
+          body: rows,
+          styles: { fontSize: 8, cellPadding: 2 },
+          headStyles: { fillColor: [59, 130, 246], textColor: 255, fontStyle: 'bold' },
+          alternateRowStyles: { fillColor: [245, 245, 245] },
+          columnStyles: { 0: { cellWidth: 60 }, 6: { cellWidth: 40 } },
+        });
+
+        doc.save(`pulse-tasks-${new Date().toISOString().split('T')[0]}.pdf`);
+      });
+    });
+  }
+
   if (loading) {
     return (
       <div className="flex items-center justify-center py-20">
@@ -261,13 +317,23 @@ export default function TasksPage() {
           <h1 className="text-xl font-semibold text-tx-primary tracking-tight">Tasks</h1>
           <p className="text-sm text-tx-muted mt-0.5">{tasks.length} total &middot; {tasks.filter(t => t.status !== 'done').length} active</p>
         </div>
-        <button
-          onClick={() => setShowModal(true)}
-          className="flex items-center gap-1.5 h-8 px-4 rounded-lg bg-brand text-tx-inverse text-sm font-semibold hover:bg-brand-hover transition-colors"
-        >
-          <Plus size={15} />
-          New Task
-        </button>
+        <div className="flex items-center gap-2">
+          <button onClick={exportToExcel} title="Export to Excel"
+            className="flex items-center gap-1.5 h-8 px-3 rounded-lg border border-border text-sm font-medium text-tx-secondary bg-surface hover:bg-subtle transition-colors">
+            <FileSpreadsheet size={14} /> Excel
+          </button>
+          <button onClick={exportToPdf} title="Export to PDF"
+            className="flex items-center gap-1.5 h-8 px-3 rounded-lg border border-border text-sm font-medium text-tx-secondary bg-surface hover:bg-subtle transition-colors">
+            <FileDown size={14} /> PDF
+          </button>
+          <button
+            onClick={() => setShowModal(true)}
+            className="flex items-center gap-1.5 h-8 px-4 rounded-lg bg-brand text-tx-inverse text-sm font-semibold hover:bg-brand-hover transition-colors"
+          >
+            <Plus size={15} />
+            New Task
+          </button>
+        </div>
       </div>
 
       {/* Filter Bar */}
