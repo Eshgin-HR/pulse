@@ -197,7 +197,8 @@ CONSTRAINTS & PRINCIPLES
 7. Overdue + critical = drop everything else. Name it, don't bury it.
 8. Track what the user says they'll do. If they mention it again without completing it, surface the pattern.
 9. This is a system for a high-performer managing 4 simultaneous tracks (PASHA / TapWork / himate.az / EshgeenOS). Context-switching cost is real. Always advise for depth over breadth.
-10. Use markdown formatting for readability (bold, lists, headers).`;
+10. Use markdown formatting for readability (bold, lists, headers).
+11. LANGUAGE MIRRORING: Always respond in the same language the user writes in. If the user writes in Azerbaijani, respond entirely in Azerbaijani. If in English, respond in English. If mixed, match the dominant language. Task names stay as-is regardless of language.`;
 
     const completion = await openai.chat.completions.create({
       model: 'gpt-4o',
