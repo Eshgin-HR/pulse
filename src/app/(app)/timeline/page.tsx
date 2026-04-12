@@ -52,6 +52,7 @@ export default function TimelinePage() {
 
   // Calendar state
   const [calMonth, setCalMonth] = useState(new Date());
+  const [selectedDay, setSelectedDay] = useState<string | null>(null);
 
   useEffect(() => {
     async function load() {
@@ -401,13 +402,66 @@ export default function TimelinePage() {
                       );
                     })}
                     {dayTasks.length > 3 && (
-                      <span className="text-[9px] text-tx-muted px-1.5">+{dayTasks.length - 3} more</span>
+                      <button onClick={() => setSelectedDay(dateStr)}
+                        className="text-[9px] text-brand font-medium px-1.5 hover:underline text-left">
+                        +{dayTasks.length - 3} more
+                      </button>
                     )}
                   </div>
                 </div>
               );
             })}
           </div>
+
+          {/* Day popup */}
+          {selectedDay && tasksByDate[selectedDay] && (
+            <div className="fixed inset-0 z-50 flex items-center justify-center bg-black/40 backdrop-blur-sm" onClick={() => setSelectedDay(null)}>
+              <div className="bg-surface border border-border rounded-xl shadow-lg w-full max-w-[400px] mx-4 max-h-[70vh] flex flex-col" onClick={e => e.stopPropagation()}>
+                <div className="flex items-center justify-between px-4 py-3 border-b border-border">
+                  <div>
+                    <h3 className="text-sm font-semibold text-tx-primary">{format(parseISO(selectedDay), 'EEEE, MMMM d')}</h3>
+                    <p className="text-2xs text-tx-muted">{tasksByDate[selectedDay].length} tasks</p>
+                  </div>
+                  <button onClick={() => setSelectedDay(null)} className="p-1 rounded-md hover:bg-subtle text-tx-muted hover:text-tx-primary">
+                    <X size={16} />
+                  </button>
+                </div>
+                <div className="flex-1 overflow-y-auto p-2">
+                  <div className="flex flex-col gap-1">
+                    {tasksByDate[selectedDay].map(task => {
+                      const isOverdue = task.due_date && task.due_date < today && task.status !== 'done';
+                      const portfolio = task.portfolio as Portfolio | undefined;
+                      const urgCfg = URGENCY_CONFIG[task.urgency];
+                      return (
+                        <Link key={task.id} href={`/tasks/${task.id}`}
+                          className={cn(
+                            'flex items-center gap-2 px-3 py-2 rounded-lg hover:bg-subtle transition-colors',
+                            task.status === 'done' && 'opacity-50'
+                          )}>
+                          <div className="w-1.5 h-1.5 rounded-full shrink-0" style={{ backgroundColor: STATUS_CONFIG[task.status].color }} />
+                          <div className="flex-1 min-w-0">
+                            <span className={cn('text-sm text-tx-primary truncate block', task.status === 'done' && 'line-through')}>
+                              {task.title}
+                            </span>
+                            {portfolio && (
+                              <span className="text-2xs text-tx-muted">{portfolio.name.split('—')[0].trim()}</span>
+                            )}
+                          </div>
+                          <span className="text-[10px] font-semibold uppercase px-1.5 py-0.5 rounded-md shrink-0"
+                            style={{ backgroundColor: urgCfg.bg, color: urgCfg.color }}>
+                            {urgCfg.label}
+                          </span>
+                          {isOverdue && (
+                            <span className="text-[9px] font-bold text-[var(--p-critical)]">LATE</span>
+                          )}
+                        </Link>
+                      );
+                    })}
+                  </div>
+                </div>
+              </div>
+            </div>
+          )}
         </div>
       )}
     </div>
